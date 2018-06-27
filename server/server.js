@@ -95,7 +95,7 @@ app.patch('/todos/:id', (req, res) => {
         res.send({ todo });
     }).catch((e) => {
         res.status(400).send({ exeption: e.message });
-    })
+    });
 });
 
 app.post('/users', (req, res) => {
@@ -109,7 +109,20 @@ app.post('/users', (req, res) => {
     }).catch((e) => {
         console.log('error',e);
         res.status(400).send(e);
-    })
+    });
+});
+
+app.post('/users/login', (req, res) => {
+    console.log('req.body is ', req.body);
+    var body = _.pick(req.body, ['email', 'password']);
+
+    User.findByCredentials(body.email, body.password).then((user) => {
+        return user.generateAuthToken().then((token) => {
+            res.header('x-auth', token).send(user);
+        });
+    }).catch((e) => {
+        res.status(400).send();
+    });
 });
 
 app.listen(port, () => {
